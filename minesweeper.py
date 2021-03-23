@@ -109,6 +109,7 @@ class Sentence():
         for i,j in self.cells:
             if self.board[i][j]:
                 mines.add((i,j))
+
         return mines
 
     def known_safes(self):
@@ -119,6 +120,7 @@ class Sentence():
         for i,j in self.cells:
             if not self.board[i][j]:
                 safes.add((i,j))
+                
         return safes
 
     def mark_mine(self, cell):
@@ -126,14 +128,17 @@ class Sentence():
         Updates internal knowledge representation given the fact that
         a cell is known to be a mine.
         """
-        raise NotImplementedError
+        if cell in self.cells:
+            self.cells.remove(cell)
+            self.count -= 1
 
     def mark_safe(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be safe.
         """
-        raise NotImplementedError
+        if cell in self.cells:
+            self.cells.remove(cell)
 
 
 class MinesweeperAI():
@@ -211,7 +216,7 @@ class MinesweeperAI():
                 if (i, j) == cell:
                     continue
 
-                cell_neighbors.add((i,j)
+                cell_neighbors.add((i,j))
 
         return cell_neighbors
 
@@ -239,6 +244,6 @@ class MinesweeperAI():
         for i in self.width:
             for j in self.height:
                 if i,j not in self.mines and i,j not in self.moves_made:
-                    choices_made.add(i,j)
+                    choices_made.add((i,j))
 
-        return random.choice(list(choices_made))
+        return random.choice((list(choices_made)))
