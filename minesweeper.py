@@ -105,23 +105,19 @@ class Sentence():
         """
         Returns the set of all cells in self.cells known to be mines.
         """
-        mines = set()
-        for i,j in self.cells:
-            if self.board[i][j]:
-                mines.add((i,j))
+        if len(self.cells) == self.count:
+            return self.cells
 
-        return mines
+        return {}
 
     def known_safes(self):
         """
         Returns the set of all cells in self.cells known to be safe.
         """
-        safes = set()
-        for i,j in self.cells:
-            if not self.board[i][j]:
-                safes.add((i,j))
-                
-        return safes
+        if self.count == 0:
+            return self.cells
+
+        return {}
 
     def mark_mine(self, cell):
         """
@@ -195,15 +191,26 @@ class MinesweeperAI():
             5) add any new sentences to the AI's knowledge base
                if they can be inferred from existing knowledge
         """
+        cell = tuple(cell)
+
+        self.moves_made.add(cell)
+        self.mark_safe(self, cell)
+
+        for i,j in neighbors(self, cell):
+            Sentence.cells.add((i,j))
+            if Minesweeper.board[i][j]:
+                Sentence.count += 1
+
+        if len(Sentence.cells) == Sentence.count:
+            for i,j in Sentence.cells:
+                self.mark_mine(self, (i,j))
         
-        # self.moves_made.add(cell)
-        # self.mark_safe(cell)
-        # neighbors = neighbors(self, cell)
-        # for neighbor in neighbors:
-        #     if neighbor in self.mines:
+        if Sentence.count == 0:
+            for i,j in Sentence.cells:
+                self.mark_safe(self, (i,j))
+        
                 
 
-        # Sentence(neighbors(self, cell), self.nearby_mines(self, cell))
         
     def neighbors(self, cell):
 
@@ -230,8 +237,7 @@ class MinesweeperAI():
         and self.moves_made, but should not modify any of those values.
         """
         for move in self.safes:
-            if move not in self.moves_made:
-                return move
+            return move
 
     def make_random_move(self):
         """
@@ -243,7 +249,7 @@ class MinesweeperAI():
         choices_made = set()
         for i in self.width:
             for j in self.height:
-                if i,j not in self.mines and i,j not in self.moves_made:
+                if (i,j) not in self.mines and (i,j) not in self.moves_made:
                     choices_made.add((i,j))
 
-        return random.choice((list(choices_made)))
+        return random.choice(list(choices_made))
