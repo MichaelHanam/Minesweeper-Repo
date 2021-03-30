@@ -209,26 +209,22 @@ class MinesweeperAI():
         self.knowledge.append(new_sentence)
         
         next_loop = True
+        sentence = set()
         temp_safes = set()
         temp_mines = set()
-        known = set()
         # temporary_knowledge = copy.deepcopy(self.knowledge)
         while next_loop:
             next_loop = False
 
             for sentence in self.knowledge:
 
-                if temp_safes.issubset(known) or temp_mines.issubset(known):
+                if temp_mines.issubset(self.knowledge) or temp_safes.issubset(self.knowledge):
                     break
-
-                print(temp_mines, "or", temp_safes, "not in", known)
 
                 temp_safes = sentence.known_safes()
                 temp_mines = sentence.known_mines()
-                print(temp_safes)
-                known = known.union(temp_safes)
-                known = known.union(temp_mines)
-                
+
+
                 self.safes = self.safes.union(temp_safes)
                 self.mines = self.mines.union(temp_mines)
 
@@ -242,14 +238,61 @@ class MinesweeperAI():
 
         cell_neighbors = set()
 
-        for i in range(cell[0] - 1, cell[0] + 2):
-            for j in range(cell[1] - 1, cell[1] + 2):
 
-                # Ignore the cell itself
-                if (i, j) == cell:
-                    continue
+        i,j = cell
 
-                cell_neighbors.add((i,j))
+
+        if i == 7:
+            for i in range(i - 1, i + 1):
+                if j == 7:
+                    for j in range(j - 1, j + 1):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+                elif j == 0:
+                    for j in range(j, j + 2):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+                else:
+                    for j in range(j - 1, j + 2):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+        if i == 0:
+            for i in range(i, i + 2):
+                if j == 7:
+                    for j in range(j - 1, j + 1):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+                elif j == 0:
+                    for j in range(j, j + 2):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+                else:
+                    for j in range(j - 1, j + 2):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+        else:
+            for i in range(i - 1, i  + 2):
+                if j == 7:
+                    for j in range(j - 1, j + 1):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+                elif j == 0:
+                    for j in range(j, j + 2):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
+                else:
+                    for j in range(j - 1, j + 2):
+                        if (i, j) == cell:
+                            continue
+                        cell_neighbors.add((i,j))
 
         return cell_neighbors
 
