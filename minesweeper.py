@@ -90,7 +90,7 @@ class Sentence():
     A sentence consists of a set of board cells,
     and a count of the number of those cells which are mines.
     """
-
+    
     def __init__(self, cells, count):
         self.cells = set(cells)
         self.count = count
@@ -136,7 +136,6 @@ class Sentence():
         if cell in self.cells:
             self.cells.remove(cell)
 
-
 class MinesweeperAI():
     """
     Minesweeper game player
@@ -176,6 +175,7 @@ class MinesweeperAI():
             sentence.mark_safe(cell)
 
     def add_knowledge(self, cell, count):
+
         """
         Called when the Minesweeper board tells us, for a given
         safe cell, how many neighboring cells have mines in them.
@@ -191,7 +191,6 @@ class MinesweeperAI():
                if they can be inferred from existing knowledge
         """
 
-        
         self.moves_made.add(cell)
         self.mark_safe(cell)
 
@@ -209,10 +208,12 @@ class MinesweeperAI():
         self.knowledge.append(new_sentence)
         
         next_loop = True
-        sentence = set()
+
         temp_safes = set()
         temp_mines = set()
-        # temporary_knowledge = copy.deepcopy(self.knowledge)
+
+        index = -1
+
         while next_loop:
             next_loop = False
             
@@ -220,14 +221,31 @@ class MinesweeperAI():
             known_mines = self.mines
 
             for sentence in self.knowledge:
+                
+                index += 1
 
                 self.safes = self.safes.union(sentence.known_safes())
                 self.mines = self.mines.union(sentence.known_mines())
 
+                for i in self.safes:
+                    if i in sentence.cells:
+
+                        sentence.cells.remove(i)
+
+                        self.knowledge[index] = sentence
+
+                for i in self.mines:
+                    if i in sentence.cells:
+
+                        sentence.cells.remove(i)
+                        sentence.count -= 1
+
+                        self.knowledge[index] = sentence
+                
+            index = -1
+
             if self.safes != known_safes or self.mines != known_mines:
                 next_loop = True
-        
-        print(self.mines)
 
     def neighbors(self, cell):
 
@@ -271,4 +289,5 @@ class MinesweeperAI():
             return None
 
         else:
-            return random.choice(list(choices_made))
+            move = random.choice(list(choices_made))
+            return move
