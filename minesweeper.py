@@ -215,84 +215,29 @@ class MinesweeperAI():
         # temporary_knowledge = copy.deepcopy(self.knowledge)
         while next_loop:
             next_loop = False
+            
+            known_safes = self.safes
+            known_mines = self.mines
 
             for sentence in self.knowledge:
 
-                if temp_mines.issubset(self.knowledge) or temp_safes.issubset(self.knowledge):
-                    break
+                self.safes = self.safes.union(sentence.known_safes())
+                self.mines = self.mines.union(sentence.known_mines())
 
-                temp_safes = sentence.known_safes()
-                temp_mines = sentence.known_mines()
-
-
-                self.safes = self.safes.union(temp_safes)
-                self.mines = self.mines.union(temp_mines)
-
-                if len(temp_safes) != 0 or len(temp_mines) != 0:
-                    next_loop = True
+            if self.safes != known_safes or self.mines != known_mines:
+                next_loop = True
         
-                
+        print(self.mines)
 
-        
     def neighbors(self, cell):
 
         cell_neighbors = set()
-
-
-        i,j = cell
-
-
-        if i == 7:
-            for i in range(i - 1, i + 1):
-                if j == 7:
-                    for j in range(j - 1, j + 1):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-                elif j == 0:
-                    for j in range(j, j + 2):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-                else:
-                    for j in range(j - 1, j + 2):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-        if i == 0:
-            for i in range(i, i + 2):
-                if j == 7:
-                    for j in range(j - 1, j + 1):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-                elif j == 0:
-                    for j in range(j, j + 2):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-                else:
-                    for j in range(j - 1, j + 2):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-        else:
-            for i in range(i - 1, i  + 2):
-                if j == 7:
-                    for j in range(j - 1, j + 1):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-                elif j == 0:
-                    for j in range(j, j + 2):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
-                else:
-                    for j in range(j - 1, j + 2):
-                        if (i, j) == cell:
-                            continue
-                        cell_neighbors.add((i,j))
+        for i in range(cell[0] - 1, cell[0] + 2):
+            for j in range(cell[1] - 1, cell[1] + 2):
+                # Ignore the cell itself
+                if (i, j) == cell or i >= self.width or j >= self.height or i < 0 or j < 0:
+                    continue
+                cell_neighbors.add((i,j))
 
         return cell_neighbors
 
@@ -322,4 +267,8 @@ class MinesweeperAI():
                 if (i,j) not in self.mines and (i,j) not in self.moves_made:
                     choices_made.add((i,j))
 
-        return random.choice(list(choices_made))
+        if list(choices_made) == []:
+            return None
+
+        else:
+            return random.choice(list(choices_made))
