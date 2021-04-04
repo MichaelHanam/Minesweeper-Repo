@@ -221,28 +221,21 @@ class MinesweeperAI():
             known_mines = self.mines
 
             for sentence in self.knowledge:
-                
-                index += 1
 
                 self.safes = self.safes.union(sentence.known_safes())
                 self.mines = self.mines.union(sentence.known_mines())
 
-                for i in self.safes:
-                    if i in sentence.cells:
+                for i,j in self.safes:
+                    if (i,j) in sentence.cells:
 
-                        sentence.cells.remove(i)
+                        sentence.mark_safe((i,j))
 
-                        self.knowledge[index] = sentence
+                for i,j in self.mines:
+                    if (i,j) in sentence.cells:
 
-                for i in self.mines:
-                    if i in sentence.cells:
-
-                        sentence.cells.remove(i)
-                        sentence.count -= 1
+                        sentence.mark_mine((i,j))
 
                         self.knowledge[index] = sentence
-                
-            index = -1
 
             if self.safes != known_safes or self.mines != known_mines:
                 next_loop = True
@@ -282,12 +275,12 @@ class MinesweeperAI():
         choices_made = set()
         for i in range(8):
             for j in range(8):
+
                 if (i,j) not in self.mines and (i,j) not in self.moves_made:
                     choices_made.add((i,j))
 
-        if list(choices_made) == []:
+        if len(choices_made) == 0:
+
             return None
 
-        else:
-            move = random.choice(list(choices_made))
-            return move
+        return random.choice(list(choices_made))
