@@ -222,9 +222,6 @@ class MinesweeperAI():
 
             for sentence in self.knowledge:
 
-                self.safes = self.safes.union(sentence.known_safes())
-                self.mines = self.mines.union(sentence.known_mines())
-
                 for i,j in self.safes:
                     if (i,j) in sentence.cells:
 
@@ -234,10 +231,12 @@ class MinesweeperAI():
                     if (i,j) in sentence.cells:
 
                         sentence.mark_mine((i,j))
-
-                        self.knowledge[index] = sentence
+                        
+                self.safes = self.safes.union(sentence.known_safes())
+                self.mines = self.mines.union(sentence.known_mines())
 
             if self.safes != known_safes or self.mines != known_mines:
+                        
                 next_loop = True
 
     def neighbors(self, cell):
